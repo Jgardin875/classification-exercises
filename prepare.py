@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[44]:
+# In[1]:
 
 
 import numpy as np
@@ -54,13 +54,13 @@ pd.set_option('display.max_columns', None)
 #     Create a function named prep_iris that accepts the untransformed iris data, and returns the data with the transformations above applied.
 # 
 
-# In[4]:
+# In[56]:
 
 
-iris = acquire.get_iris_data()
+iris_o = acquire.get_iris_data()
 
 
-# In[5]:
+# In[57]:
 
 
 def prep_iris(df):
@@ -71,27 +71,44 @@ def prep_iris(df):
     return df
 
 
-# In[6]:
+# In[58]:
 
 
-iris = prep_iris(iris)
+def split_iris_data(df):
+    '''
+    This function performs split on telco data, stratify churn.
+    Returns train, validate, and test dfs.
+    '''
+    train_validate, test = train_test_split(df, test_size=.2, 
+                                        random_state=123, 
+                                        stratify=df.species)
+    train, validate = train_test_split(train_validate, test_size=.2, 
+                                   random_state=123, 
+                                   stratify=train_validate.species)
+    return train, validate, test
 
 
-# In[7]:
+# In[59]:
 
 
-iris.head()
+iris = prep_iris(iris_o)
+
+
+# In[60]:
+
+
+train, validate, test = split_iris_data(iris)
 
 
 # ### Titanic
 
-# In[143]:
+# In[47]:
 
 
 df = acquire.get_titanic_data()
 
 
-# In[144]:
+# In[48]:
 
 
 def impute_mode(df):
@@ -103,7 +120,7 @@ replace non-existant values before breaking it down into training sets
     return df
 
 
-# In[145]:
+# In[49]:
 
 
 def split_titanic_data(df):
@@ -120,7 +137,7 @@ def split_titanic_data(df):
     return train, validate, test
 
 
-# In[146]:
+# In[50]:
 
 
 def prep_titanic(df):
@@ -129,67 +146,64 @@ def prep_titanic(df):
     df = pd.concat([df, dummy_df], axis=1)
     df = impute_mode(df)
     return df
-
-train, validate, test = split_titanic_data(df)
-    
     
 
 
-# In[147]:
+# In[51]:
 
 
 titanic = prep_titanic(df)
 
 
-# In[148]:
+# In[52]:
 
 
-titanic.info()
+train, validate, test = split_titanic_data(titanic)
 
 
-# In[149]:
+# In[15]:
 
 
 titanic.shape
 
 
-# In[150]:
+# In[16]:
 
 
 train.shape
 
 
-# In[151]:
+# In[17]:
 
 
 test.shape
 
 
-# In[152]:
+# In[18]:
 
 
 validate.shape
 
 
-# In[ ]:
+# In[19]:
 
 
 #learnign imputer stuff
 
 
-# In[ ]:
+# In[20]:
 
 
 #imputer = SimpleImputer(strategy='most_frequent')
 
 
-# In[ ]:
+# In[21]:
 
 
 #imputer = imputer.fit(train[['embark_town']])
 
 
-# In[ ]:
+# In[22]:
 
 
 #df[['embark_town']] = imputer.transform(df[['embark_town']])
@@ -203,13 +217,13 @@ validate.shape
 
 # # Telco
 
-# In[71]:
+# In[23]:
 
 
 df = acquire.get_telco_data()
 
 
-# In[72]:
+# In[24]:
 
 
 def split_telco_data(df):
@@ -226,7 +240,7 @@ def split_telco_data(df):
     return train, validate, test
 
 
-# In[73]:
+# In[25]:
 
 
 def prep_telco(df):
@@ -246,34 +260,44 @@ def prep_telco(df):
     df['churn_encoded'] = df.churn.map({'Yes': 1, 'No': 0})
     return df
 
+
+# In[ ]:
+
+
+
+
+
+# In[46]:
+
+
 train, validate, test = split_telco_data(df)
 
 
-# In[75]:
+# In[26]:
 
 
-prep_telco(df)
+telco = prep_telco(df)
 
 
-# In[76]:
+# In[27]:
 
 
 telco.shape
 
 
-# In[77]:
+# In[28]:
 
 
 train.shape
 
 
-# In[78]:
+# In[29]:
 
 
 validate.shape
 
 
-# In[79]:
+# In[30]:
 
 
 test.shape
@@ -288,88 +312,76 @@ test.shape
 # In[33]:
 
 
-telco.head()
-
-
-# In[14]:
-
-
-telco.info()
-
-
-# In[15]:
-
-
 #indivudual steps
 
 
-# In[16]:
+# In[34]:
 
 
 df.loc[df.total_charges == ' ', 'total_charges'] = df.monthly_charges
 
 
-# In[17]:
+# In[35]:
 
 
 df.total_charges = df.total_charges.astype('float')
 
 
-# In[18]:
+# In[36]:
 
 
 df.total_charges.sort_values()
 
 
-# In[19]:
+# In[37]:
 
 
 # several of the accounts have no totals
 
 
-# In[20]:
+# In[38]:
 
 
 df[df.total_charges == ' '];
 
 
-# In[21]:
+# In[39]:
 
 
 #it appears that if they are new cosutomers, they dont have totals till after they pay
 
 
-# In[22]:
+# In[40]:
 
 
 df[df.total_charges == ' '];
 
 
-# In[23]:
+# In[41]:
 
 
 df.loc[df.total_charges == ' ', 'total_charges'] = df.monthly_charges
 
 
-# In[24]:
+# In[42]:
 
 
 df[df.tenure == 0];
 
 
-# In[25]:
+# In[43]:
 
 
 df.total_charges = df.total_charges.astype('float')
 
 
-# In[26]:
+# In[44]:
 
 
 df = df[df.total_charges != ' ']
 
 
-# In[27]:
+# In[45]:
 
 
 # def telco_clean_monthly_total (df):
